@@ -1,0 +1,28 @@
+{
+  "name": "webserver-todos-mongodb",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aligaby/webserver-todos-mongodb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aligaby/webserver-todos-mongodb/issues"
+  },
+  "homepage": "https://github.com/Aligaby/webserver-todos-mongodb#readme",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "http": "^0.0.1-security",
+    "mongodb": "^4.6.0",
+    "url": "^0.11.0"
+  }
+}
