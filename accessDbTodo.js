@@ -18,21 +18,8 @@ const [month, day, year] = [
 ];
 export const today = `${day}.${month}.${year}`;
 
-// export const myData = [
-//   {
-//     id: 0,
-//     title: "Title 0",
-//     description: "Description 0",
-//     dueDate: today,
-//     isComplete: true,
-//   },
-// ];
-
-// const uri =
-//   "mongodb+srv://y00G1u9pNtGGw82i:y00G1u9pNtGGw82i@cluster0.jxlayxm.mongodb.net/test";
 const uri = accessDb.MONGO_URI;
 const client = new MongoClient(uri);
-// let myData = "";
 
 async function run() {
   try {
@@ -44,7 +31,6 @@ async function run() {
     const myData = await myCollections.findOne(query);
     console.log(myData);
   } finally {
-    // Ensures that the client will close when you finish/error
     await client.close();
   }
 }
