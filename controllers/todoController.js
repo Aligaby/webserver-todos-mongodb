@@ -1,4 +1,4 @@
-import { myData } from "../accessDbTodo.js";
+import { myData, today } from "../accessDbTodo.js";
 
 function indexOfObjectInMyData(id) {
   return myData.findIndex((item) => item.id === +id);
@@ -52,11 +52,11 @@ async function postTodo(request, response) {
     }
 
     if (!bodyTodos.dueDate) {
-      bodyTodos.dueDate = "unknown";
+      bodyTodos.dueDate = today;
     }
 
     if (!bodyTodos.isComplete) {
-      bodyTodos.isComplete = false;
+      bodyTodos.isComplete = true;
     }
 
     const newTodo = {
