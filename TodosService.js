@@ -12,9 +12,9 @@ export async function run() {
     const myDatabase = client.db(accessDb.MONGO_DB);
     const todoCollection = myDatabase.collection(accessDb.MONGO_COLLECTION);
 
-    collections.todos = todoCollection;
+    collections.myData = todoCollection;
   } catch (err) {
-    throw new Error(`Eroare conectare db => ${err}`);
+    throw new Error(`Database connection error => ${err}`);
   }
 }
 

@@ -1,4 +1,5 @@
 import http from "http";
+// import { parse } from "path";
 import url from "url";
 import { TodoController } from "./controllers/todoController.js";
 import { run } from "./TodosService.js";
@@ -12,36 +13,34 @@ const accesServer = {
 
 server.on("request", (request, response) => {
   const parsedUrl = url.parse(request.url, true);
-  const idTodos = parsedUrl.query["id"];
+  const idTodos = parsedUrl.query["id"] || "";
 
-  try {
-    if (parsedUrl.pathname === "/todos" && request.method === "GET") {
-      if (idTodos === "") {
-        throw new Error("Insert a value to ID");
-      } else if (idTodos && !isNaN(+idTodos)) {
-        TodoController.getTodo(idTodos, request, response);
-      } else {
-        TodoController.getTodos(request, response);
-      }
-    }
+  if (parsedUrl.pathname !== "/todos") {
+    response.end("This URL is invalid. Put /todos for a valid URL.");
+  }
 
-    if (parsedUrl.pathname === "/todos" && request.method === "POST") {
-      TodoController.postTodo(request, response);
+  if (parsedUrl.pathname === "/todos" && request.method === "GET") {
+    if (idTodos) {
+      TodoController.getTodo(idTodos, request, response);
+    } else {
+      TodoController.getTodos(request, response);
     }
+  }
 
-    if (parsedUrl.pathname === "/todos" && request.method === "DELETE") {
-      TodoController.deleteTodo(idTodos, request, response);
-    }
+  if (parsedUrl.pathname === "/todos" && request.method === "POST") {
+    TodoController.postTodo(request, response);
+  }
 
-    if (parsedUrl.pathname === "/todos" && request.method === "PATCH") {
-      TodoController.patchTodo(idTodos, request, response);
-    }
-  } catch (err) {
-    response.end(`Attention, you have an error => ${err.message}`);
+  if (parsedUrl.pathname === "/todos" && request.method === "DELETE") {
+    TodoController.deleteTodo(idTodos, request, response);
+  }
+
+  if (parsedUrl.pathname === "/todos" && request.method === "PATCH") {
+    TodoController.patchTodo(idTodos, request, response);
   }
 });
 
-async function start() {
+async function startServer() {
   await run();
 
   server.listen(accesServer.port, accesServer.host, () => {
@@ -51,4 +50,4 @@ async function start() {
   });
 }
 
-start();
+startServer();

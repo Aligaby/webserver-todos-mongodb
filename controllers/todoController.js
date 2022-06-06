@@ -1,16 +1,12 @@
 import { collections } from "../TodosService.js";
 
-// const date = new Date();
-// const [month, day, year] = [
-//   date.getMonth() + 1,
-//   date.getDate() + 2,
-//   date.getFullYear(),
-// ];
-// export const today = `${day}.${month}.${year}`;
-
-function indexOfObjectInMyData(id) {
-  return myData.findIndex((item) => item.id === +id);
-}
+const date = new Date();
+const [month, day, year] = [
+  date.getMonth() + 1,
+  date.getDate() + 2,
+  date.getFullYear(),
+];
+const today = `${day}.${month}.${year}`;
 
 function requestOnBody(request) {
   return new Promise((resolve, reject) => {
@@ -28,23 +24,31 @@ function requestOnBody(request) {
   });
 }
 
-function getTodo(idTodos, request, response) {
-  const searchInArray = myData.filter((item) => item.id === +idTodos);
-
-  if (searchInArray.length === 0) {
-    throw new Error("This ID is not exists");
+async function getTodos(request, response) {
+  try {
+    const todos = await collections.myData.find({}).toArray();
+    response.setHeader("Content-Type", "application/json");
+    response.writeHead(200);
+    response.end(JSON.stringify(todos));
+  } catch (err) {
+    response.end(`Attention, you have an error => ${err.message}`);
   }
-
-  response.setHeader("Content-Type", "application/json");
-  response.writeHead(200);
-  response.end(JSON.stringify(searchInArray));
 }
 
-async function getTodos(request, response) {
-  const todos = await collections.todos.findOne({ id: 1 });
-  response.setHeader("Content-Type", "application/json");
-  response.writeHead(200);
-  response.end(JSON.stringify(todos));
+async function getTodo(idTodos, request, response) {
+  try {
+    const searchInArray = await collections.myData.findOne({ id: +idTodos });
+
+    if (!searchInArray) {
+      throw new Error("This ID is not exists");
+    }
+
+    response.setHeader("Content-Type", "application/json");
+    response.writeHead(200);
+    response.end(JSON.stringify(searchInArray));
+  } catch (err) {
+    response.end(`Attention, you have an error => ${err.message}`);
+  }
 }
 
 async function postTodo(request, response) {
@@ -60,37 +64,42 @@ async function postTodo(request, response) {
     }
 
     if (!bodyTodos.dueDate) {
-      bodyTodos.dueDate = today;
+      bodyTodos.dueDate = new Date(today);
     }
 
     if (!bodyTodos.isComplete) {
       bodyTodos.isComplete = true;
     }
 
+    const newId = await collections.myData.count({});
     const newTodo = {
-      id: myData.length,
+      id: newId + 1,
       title: bodyTodos.title,
       description: bodyTodos.description,
       dueData: bodyTodos.dueDate,
       isComplete: bodyTodos.isComplete,
     };
 
-    myData.push(newTodo);
+    await collections.myData.insertOne(newTodo);
     response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify(myData.slice(-1)));
+    response.end(JSON.stringify(newTodo));
   } catch (err) {
     response.end(`ATTENTION => ${err.message}`);
   }
 }
 
-function deleteTodo(idTodos, request, response) {
-  const findIndexMyId = indexOfObjectInMyData(idTodos);
+async function deleteTodo(idTodos, request, response) {
+  try {
+    const findIndexMyId = await collections.myData.deleteOne({ id: +idTodos });
+    const isDeleted = findIndexMyId.deletedCount > 0;
 
-  if (findIndexMyId === -1) {
-    throw new Error(`ID number ${idTodos} does not exists `);
-  } else {
-    myData.splice(findIndexMyId, 1);
-    response.end(`Choosed ID ${idTodos} was removed`);
+    if (!isDeleted) {
+      throw new Error(`ID [ ${idTodos} ] does not exist.`);
+    }
+
+    response.end(`You deleted ID = ${idTodos}`);
+  } catch (err) {
+    response.end(`ATTENTION => ${err.message}`);
   }
 }
 
@@ -122,8 +131,8 @@ async function patchTodo(idTodos, request, response) {
 }
 
 export const TodoController = {
-  getTodo,
   getTodos,
+  getTodo,
   postTodo,
   deleteTodo,
   patchTodo,
