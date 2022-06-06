@@ -1,4 +1,12 @@
-import { myData, today } from "../accessDbTodo.js";
+import { collections } from "../TodosService.js";
+
+// const date = new Date();
+// const [month, day, year] = [
+//   date.getMonth() + 1,
+//   date.getDate() + 2,
+//   date.getFullYear(),
+// ];
+// export const today = `${day}.${month}.${year}`;
 
 function indexOfObjectInMyData(id) {
   return myData.findIndex((item) => item.id === +id);
@@ -33,10 +41,10 @@ function getTodo(idTodos, request, response) {
 }
 
 async function getTodos(request, response) {
-  // const todos = await databaseService.getTodos;
+  const todos = await collections.todos.findOne({ id: 1 });
   response.setHeader("Content-Type", "application/json");
   response.writeHead(200);
-  response.end(JSON.stringify(myData));
+  response.end(JSON.stringify(todos));
 }
 
 async function postTodo(request, response) {

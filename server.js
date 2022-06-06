@@ -1,6 +1,7 @@
 import http from "http";
 import url from "url";
 import { TodoController } from "./controllers/todoController.js";
+import { run } from "./TodosService.js";
 
 const server = http.createServer();
 
@@ -40,8 +41,14 @@ server.on("request", (request, response) => {
   }
 });
 
-server.listen(accesServer.port, accesServer.host, () => {
-  console.log(
-    `Server is running on http://${accesServer.host}:${accesServer.port}`
-  );
-});
+async function start() {
+  await run();
+
+  server.listen(accesServer.port, accesServer.host, () => {
+    console.log(
+      `Server is running on http://${accesServer.host}:${accesServer.port}`
+    );
+  });
+}
+
+start();
