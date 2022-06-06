@@ -104,27 +104,33 @@ async function deleteTodo(idTodos, request, response) {
 }
 
 async function patchTodo(idTodos, request, response) {
-  const findIndexMyId = indexOfObjectInMyData(idTodos);
-
   try {
-    const myIdObject = await requestOnBody(request);
-    const bodyTodos = myData[findIndexMyId];
+    const updateTodoProperties = await requestOnBody(request);
 
-    const newTodo = {
-      title: bodyTodos.title,
-      description: bodyTodos.description,
-    };
-
-    if (myIdObject.title) {
-      newTodo["title"] = myIdObject.title;
+    if (!updateTodoProperties.title) {
+      throw new Error("Modify TITLE");
     }
-    if (myIdObject.description) {
-      newTodo["description"] = myIdObject.description;
+    if (!updateTodoProperties.description) {
+      throw new Error("Modify DESCRIPTION");
     }
 
-    myData[findIndexMyId] = { ...myData[findIndexMyId], ...newTodo };
+    const updatedTodo = await collections.myData.findOneAndUpdate(
+      { id: +idTodos },
+      {
+        $set: {
+          title: updateTodoProperties.title,
+          description: updateTodoProperties.description,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    if (updatedTodo.value === null) {
+      throw new Error(`ID [ ${idTodos} ] does not exist.`);
+    }
+
     response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify(myData[findIndexMyId]));
+    response.end(JSON.stringify(updatedTodo.value));
   } catch (err) {
     response.end(`Don't send correct data => ${err}`);
   }
